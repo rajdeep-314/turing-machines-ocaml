@@ -19,11 +19,12 @@ type action_t =
 
 
 type ('a, 'q) t =
-    { q0 : 'q;
+    { state : 'q;
       f_states : 'q list ;
-      sigma : 'a list ;
       delta : 'q -> 'a -> 'q * 'a * action_t ;
-      tape : 'a tape_t }
+      tape : 'a tape_t ;
+      printer_a : 'a -> unit ;
+      printer_q : 'q -> unit }
 
 
 let validate_tape (Tape (l, v, r)) ls =
@@ -32,15 +33,16 @@ let validate_tape (Tape (l, v, r)) ls =
     opt_list_list_mem ls r
 
 
-let make_machine q0 f_states sigma delta tape =
+let make_machine q0 f_states sigma delta tape p_a p_q =
     if validate_tape tape sigma then
         failwith "Incompatible starting tape and \\Sigma values."
     else
-        { q0 = q0 ;
+        { state = q0 ;
           f_states = f_states ;
-          sigma = sigma ;
           delta = delta ;
-          tape = tape }
+          tape = tape ;
+          printer_a = p_a ;
+          printer_q = p_q }
 
 
 let move_head (Tape (l, v, r) as tp) = function
@@ -51,5 +53,6 @@ let move_head (Tape (l, v, r) as tp) = function
     | Right ->
             let new_v, new_r = head_and_tail r in
             Tape (v :: l, new_v, new_r)
+
 
 

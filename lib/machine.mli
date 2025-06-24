@@ -50,7 +50,7 @@ type action_t =
     namely
 
     {m M = \langle Q, \Gamma, b, \Sigma, \delta, q_0, F \rangle}
-    
+
     A slightly more detailed description follows.
         + ['a]: Values of this type are considered to be the alphabets that can
         be placed inside the tape's cells. This type is analogous to {m \Gamma}.
@@ -58,7 +58,8 @@ type action_t =
         need for an explicit {m b}.
         + ['q]: Values of this type are considered to be the states, so this
         type is analogous to {m Q}.
-        + [q0]: A value of ['q], denoting the initial state. This is {m q_0}.
+        + [state]: A value of ['q], denoting the current state. Initially, this
+        is {m q_0}.
         + [f_states]: Contains ['q] values which are considered toe be final
         states. This is analogous to {m F}.
         + [sigma]: Contains ['a] values which are considered to be valid in
@@ -68,17 +69,24 @@ type action_t =
         written at the head position, and the action that the head should
         perform after the writing, which is a value of `action_t`. Analogous to
         {m \delta:(Q\backslash F)\times\Gamma\to Q\times\Gamma\times\{L, R, N\}}.
+        + [tape]: The current tape, which implicitly knows where the head is,
+        due to the type [tape_t].
+        + [printer_a]: Function to print a symbol from the alphabet.
+        + [printer_q]: Function to print a state.
 
     Catches/Differences:
+        + {m \Sigma} is not kept track of, it's only used once while validating
+        the input tape.
         + No attention is paid to whether ['a] and ['q] are finite.
         + The Wikipedia definition doesn't include {m N} as an action, but this
         definition does, to denote that the head stays in place. *)
 type ('a, 'q) t =
-    { q0 : 'q ;
+    { state : 'q ;
       f_states : 'q list ;
-      sigma : 'a list ;
       delta : 'q -> 'a -> 'q * 'a * action_t ;
-      tape : 'a tape_t }
+      tape : 'a tape_t ;
+      printer_a : 'a -> unit ;
+      printer_q : 'q -> unit }
 
 
 (** Validates the input tape with {m \Sigma} - ensures that it doesn't have
@@ -89,7 +97,8 @@ val validate_tape : 'a tape_t -> 'a list -> bool
 (** Helper function to construct a Turing machine. *)
 val make_machine :
     'q -> 'q list -> 'a list -> ('q -> 'a -> 'q * 'a * action_t) -> 'a tape_t
-        -> ('a, 'q) t
+        -> ('a -> unit) -> ('q -> unit)
+            -> ('a, 'q) t
 
 
 val move_head : 'a tape_t -> action_t -> 'a tape_t
