@@ -74,7 +74,7 @@ let print_tape m =
 
 let print_tape_extended m n =
     let (Tape (l, v, r)) = m.tape in
-    let new_l = fix_length (List.rev l) n in
+    let new_l = List.rev (fix_length l n) in
     let new_r = fix_length r n in
     let () = Printf.printf "| " in
     let () = print_symb_list m new_l in
