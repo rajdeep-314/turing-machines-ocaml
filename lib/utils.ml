@@ -15,3 +15,11 @@ let head_and_tail = function
     | [] -> (None, [])
     | x :: xs -> (x, xs)
 
+
+let rec fix_length l n =
+    if n <= 0 then []
+    else
+        match l with
+        | [] -> None :: fix_length [] (n - 1)
+        | x :: xs -> x :: fix_length xs (n - 1)
+

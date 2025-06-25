@@ -5,10 +5,11 @@
     alphabet and the type of the states. *)
 
 
+(** {1 Types and Representations} *)
 
-(** Tape representation:
+(** {2 Tape} *)
 
-    If the symbols on the tape are values of type ['a], then the tape is
+(** If the symbols on the tape are values of type ['a], then the tape is
     represented by two lists, say {m L : 'a\,\mathrm{option}} and
     {m R : 'a\,\mathrm{option}}, and a value {m v : 'a} such that the head
     currently points to {m v}, and {m L} and {m R} denote how the tape is to
@@ -28,20 +29,28 @@
         [L : int option list = [None; Some 1; None; Some 1]]
 
         [R : int option list = [None; None; Some 1; Some 1]] *)
-type 'a tape_t =
+type 'a tape =
     Tape of 'a option list * 'a option * 'a option list             (** {m L, v, R} *)
 
 (** Helper function to construct a tape. *)
-val make_tape : 'a option list -> 'a option -> 'a option list -> 'a tape_t
+val make_tape : 'a option list -> 'a option -> 'a option list -> 'a tape
 
+
+(** Gives the value at the head for a tape. *)
+val tape_head : 'a tape -> 'a option
+
+
+(** {2 Actions} *)
 
 (** Type to capture what the head is supposed to do after a step - whether it
     should move one cell left, move one cell right, or do nothing. *)
-type action_t =
+type action =
     | Left
     | Right
     | Nothing
 
+
+(** {2 Machine} *)
 
 (** Type for a Turing machine with alphabets being values of the type ['a]
     and states being values of the type ['q]. This representation is inspired
@@ -62,19 +71,17 @@ type action_t =
         is {m q_0}.
         + [f_states]: Contains ['q] values which are considered toe be final
         states. This is analogous to {m F}.
-        + [sigma]: Contains ['a] values which are considered to be valid in
-        the inital tape. Analogous to {m \Sigma}.
         + [delta]: A curried function meant to take the current state and the
         alphabet at the head, to obtain the next state, the new symbol to be
         written at the head position, and the action that the head should
-        perform after the writing, which is a value of `action_t`. Analogous to
+        perform after the writing, which is a value of [action]. Analogous to
         {m \delta:(Q\backslash F)\times\Gamma\to Q\times\Gamma\times\{L, R, N\}}.
         + [tape]: The current tape, which implicitly knows where the head is,
-        due to the type [tape_t].
+        due to the type [tape].
         + [printer_a]: Function to print a symbol from the alphabet.
         + [printer_q]: Function to print a state.
 
-    Catches/Differences:
+    {b Catches/Differences}:
         + {m \Sigma} is not kept track of, it's only used once while validating
         the input tape.
         + No attention is paid to whether ['a] and ['q] are finite.
@@ -83,23 +90,74 @@ type action_t =
 type ('a, 'q) t =
     { state : 'q ;
       f_states : 'q list ;
-      delta : 'q -> 'a -> 'q * 'a * action_t ;
-      tape : 'a tape_t ;
+      delta : 'q -> 'a option -> 'q * 'a option * action ;
+      tape : 'a tape ;
       printer_a : 'a -> unit ;
       printer_q : 'q -> unit }
 
 
 (** Validates the input tape with {m \Sigma} - ensures that it doesn't have
     any non-blank symbols that are not in {m \Sigma}. *)
-val validate_tape : 'a tape_t -> 'a list -> bool
-
+val validate_tape : 'a tape -> 'a list -> bool
 
 (** Helper function to construct a Turing machine. *)
 val make_machine :
-    'q -> 'q list -> 'a list -> ('q -> 'a -> 'q * 'a * action_t) -> 'a tape_t
-        -> ('a -> unit) -> ('q -> unit)
-            -> ('a, 'q) t
+    'q -> 'q list -> 'a list
+        -> ('q -> 'a option -> 'q * 'a option * action) -> 'a tape
+            -> ('a -> unit) -> ('q -> unit)
+                -> ('a, 'q) t
 
 
-val move_head : 'a tape_t -> action_t -> 'a tape_t
+(** {1 Printing Functions} *)
+
+
+(** Print the value at the tape head. *)
+val print_head : ('a, 'q) t -> unit
+
+(** Print the smallest continguous section of the tape such that everything
+    to it's left and right is just empty cells.
+
+    The symbol at the head is printed enclosed in asterisks.
+    For example, [1] would be printed as [*1*]. *)
+val print_tape : ('a, 'q) t -> unit
+
+(** Prints the tape with [n] entries to either side of the head, [n] being
+    the second argument to the function. *)
+val print_tape_extended : ('a, 'q) t -> int -> unit
+
+(** Print the state that the machine is currently in. *)
+val print_current_state : ('a, 'q) t -> unit
+
+(** Print all the states in [m.f_states] ({m F} analogue). *)
+val print_f_states : ('a, 'q) t -> unit
+
+(** Print some general info about the machine. Just a convenient way to use
+    the other printing functions above together. *)
+val print_machine : ('a, 'q) t -> unit
+
+
+
+
+(** {1 Operational Functions} *)
+
+
+(** Updates a tape based on an action and returns the resultant tape. *)
+val move_head : 'a tape -> action -> 'a tape
+
+(** "Run" a machine - perform one "step" of "evaluation" baesd on the
+    machine's parameters - namely it's tape head, state and {m \delta}. *)
+val run : ('a, 'q) t -> ('a, 'q) t
+
+(** Run a machine till it halts. If it doesn't, run it forever. *)
+val run_till_halt : ('a, 'q) t -> ('a, 'q) t
+
+(** "Runs" the machine, displaying it's info at each stage using
+    [print_machine], along with the stage number.
+    Meant to be called by programs using this as a library. *)
+val execute : ('a, 'q) t -> unit
+
+(** "Runs" the machine, displaying it's tape at each stage, with [n] entries
+    to the left and right of the head, [n] being the second argument to the
+    function. *)
+val execute_tape : ('a, 'q) t -> int -> unit
 

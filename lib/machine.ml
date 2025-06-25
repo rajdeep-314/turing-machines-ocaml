@@ -6,13 +6,15 @@
 open Utils
 
 
-type 'a tape_t =
+type 'a tape =
     Tape of 'a option list * 'a option * 'a option list
 
 let make_tape l v r = Tape (l, v, r)
 
+let tape_head (Tape (_, v, _)) = v
 
-type action_t =
+
+type action =
     | Left
     | Right
     | Nothing
@@ -21,8 +23,8 @@ type action_t =
 type ('a, 'q) t =
     { state : 'q;
       f_states : 'q list ;
-      delta : 'q -> 'a -> 'q * 'a * action_t ;
-      tape : 'a tape_t ;
+      delta : 'q -> 'a option -> 'q * 'a option * action ;
+      tape : 'a tape ;
       printer_a : 'a -> unit ;
       printer_q : 'q -> unit }
 
@@ -35,15 +37,76 @@ let validate_tape (Tape (l, v, r)) ls =
 
 let make_machine q0 f_states sigma delta tape p_a p_q =
     if validate_tape tape sigma then
-        failwith "Incompatible starting tape and \\Sigma values."
-    else
         { state = q0 ;
           f_states = f_states ;
           delta = delta ;
           tape = tape ;
           printer_a = p_a ;
           printer_q = p_q }
+    else
+        failwith "Incompatible starting tape and \\Sigma values."
 
+
+
+(* Printing functions. *)
+
+let print_symb m = function
+    | None -> Printf.printf "_"     (* Current placeholder for a blank cell. *)
+    | Some v -> m.printer_a v
+
+let print_symb_list m =
+    List.iter (fun x -> print_symb m x; Printf.printf " | ")
+
+
+let print_head m =
+    print_symb m (tape_head m.tape)
+
+let print_tape m =
+    let (Tape (l, v, r)) = m.tape in
+    let () = Printf.printf "... | " in
+    let () = print_symb_list m (List.rev l) in
+    let () = Printf.printf "*" in
+    let () = print_symb m v in
+    let () = Printf.printf "* | " in
+    let () = print_symb_list m r in
+    Printf.printf "..."
+
+
+let print_tape_extended m n =
+    let (Tape (l, v, r)) = m.tape in
+    let new_l = fix_length (List.rev l) n in
+    let new_r = fix_length r n in
+    let () = Printf.printf "| " in
+    let () = print_symb_list m new_l in
+    let () = Printf.printf "*" in
+    let () = print_symb m v in
+    let () = Printf.printf "* | " in
+    print_symb_list m new_r
+
+
+let print_current_state m =
+    m.printer_q m.state
+
+let print_state_list m ls =
+    let () = Printf.printf "| " in
+    let () = List.iter (fun x -> m.printer_q x; Printf.printf " | ") ls in
+    Printf.printf "|"
+
+
+let print_f_states m =
+    print_state_list m m.f_states
+
+
+let print_machine m =
+    let () = Printf.printf "Head: " in
+    let () = print_head m in
+    let () = Printf.printf "\nTape: " in
+    let () = print_tape m in
+    let () = Printf.printf "\nCurrent state: " in
+    print_current_state m
+
+
+(* Operation functions. *)
 
 let move_head (Tape (l, v, r) as tp) = function
     | Nothing -> tp
@@ -55,4 +118,49 @@ let move_head (Tape (l, v, r) as tp) = function
             Tape (v :: l, new_v, new_r)
 
 
+let run m =
+    let Tape (l, v, r) = m.tape in
+    let new_state, new_v, act = m.delta m.state v in
+    let new_tape = move_head (Tape (l, new_v, r)) act in
+    { state = new_state ;
+      f_states = m.f_states ;
+      delta = m.delta ;
+      tape = new_tape ;
+      printer_a = m.printer_a ;
+      printer_q = m.printer_q }
+
+
+let rec run_till_halt m =
+    if List.mem m.state m.f_states then m
+    else run_till_halt (run m)
+
+
+
+
+(* Helper function for execute, to keep track of the stage number. *)
+let rec execute_h m sn =
+    let () = Printf.printf "Stage number %d" sn in
+    let () = Printf.printf "\n------------------\n" in
+    if List.mem m.state m.f_states then
+        Printf.printf "HALTED!\n"
+    else
+        let () = print_machine m in
+        let () = print_endline "\n\n" in
+        execute_h (run m) (sn + 1)
+
+let execute m =
+    execute_h m 1
+
+
+let rec execute_tape_h m n sn =
+    let () = Printf.printf "%d:\t\t" sn in
+    if List.mem m.state m.f_states then
+        Printf.printf "HALTED!\n"
+    else
+        let () = print_tape_extended m n in
+        let () = print_endline "" in
+        execute_tape_h (run m) n (sn + 1)
+
+let execute_tape m n =
+    execute_tape_h m n 1
 
