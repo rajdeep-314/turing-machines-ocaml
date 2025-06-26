@@ -51,7 +51,7 @@ let make_machine q0 f_states sigma delta tape p_a p_q =
 (* Printing functions. *)
 
 let print_symb m = function
-    | None -> Printf.printf "_"     (* Current placeholder for a blank cell. *)
+    | None -> Printf.printf "."     (* Current placeholder for a blank cell. *)
     | Some v -> m.printer_a v
 
 let print_symb_list m =
@@ -65,23 +65,46 @@ let print_tape m =
     let (Tape (l, v, r)) = m.tape in
     let () = Printf.printf "... | " in
     let () = print_symb_list m (List.rev l) in
-    let () = Printf.printf "*" in
+    let () = Printf.printf "\027[1;36m" in
     let () = print_symb m v in
-    let () = Printf.printf "* | " in
+    let () = Printf.printf "\027[0m | " in
     let () = print_symb_list m r in
     Printf.printf "..."
 
 
 let print_tape_extended m n =
     let (Tape (l, v, r)) = m.tape in
-    let new_l = List.rev (fix_length l n) in
-    let new_r = fix_length r n in
+    let l_list = List.rev (fix_length l n) in
+    let r_list = fix_length r n in
     let () = Printf.printf "| " in
-    let () = print_symb_list m new_l in
-    let () = Printf.printf "*" in
+    let () = print_symb_list m l_list in
+    let () = Printf.printf "\027[1;36;48;5;53m" in
     let () = print_symb m v in
-    let () = Printf.printf "* | " in
-    print_symb_list m new_r
+    let () = Printf.printf "\027[0m | " in
+    print_symb_list m r_list
+
+
+let print_tape_pretty m n1 n2 =
+    if n1 <= 0 then ()
+    else
+        let () = Printf.printf "| " in
+        let (Tape (l, v, r)) = m.tape in
+        let l_len = max 0 (min (n2 - 1) n1) in
+        let r_len = max 0 (min (n1 - n2) n1) in
+        let l_list = List.rev (fix_length l l_len) in
+        let r_list = fix_length r r_len in
+        (* If the head is out of bounds on the left. *)
+        if n2 <= 0 then
+            print_symb_list m r_list
+        (* If the head is out of bounds on the right. *)
+        else if n2 > n1 then
+            print_symb_list m l_list
+        else
+            let () = print_symb_list m l_list in
+            let () = Printf.printf "\027[1;36;48;5;53m" in
+            let () = print_symb m v in
+            let () = Printf.printf "\027[0m | " in
+            print_symb_list m r_list
 
 
 let print_current_state m =
@@ -152,15 +175,46 @@ let execute m =
     execute_h m 1
 
 
-let rec execute_tape_h m n sn =
+let rec execute_moving_tape_h m n sn =
     let () = Printf.printf "%d:\t\t" sn in
     if List.mem m.state m.f_states then
         Printf.printf "HALTED!\n"
     else
         let () = print_tape_extended m n in
         let () = print_endline "" in
-        execute_tape_h (run m) n (sn + 1)
+        execute_moving_tape_h (run m) n (sn + 1)
 
-let execute_tape m n =
-    execute_tape_h m n 1
+let execute_moving_tape m n =
+    execute_moving_tape_h m n 1
+
+
+let head_offset_delta = function
+    | Left -> -1
+    | Right -> 1
+    | Nothing -> 0
+
+
+let rec execute_moving_head_h m n1 n2 sn =
+    let () = Printf.printf "%d:\t\t" sn in
+    if List.mem m.state m.f_states then
+        Printf.printf "HALTED!\n"
+    else
+        let () = print_tape_pretty m n1 n2 in
+        let () = print_endline "" in
+        let Tape (l, v, r) = m.tape in
+        let new_state, new_v, act = m.delta m.state v in
+        let new_tape = move_head (Tape (l, new_v, r)) act in
+        let new_m = 
+            { state = new_state ;
+              f_states = m.f_states ;
+              delta = m.delta ;
+              tape = new_tape ;
+              printer_a = m.printer_a ;
+              printer_q = m.printer_q } in
+        let new_n2 = n2 + head_offset_delta act in
+        execute_moving_head_h new_m n1 new_n2 (sn + 1)
+
+let execute_moving_head m n1 n2 =
+    execute_moving_head_h m n1 n2 1
+
 

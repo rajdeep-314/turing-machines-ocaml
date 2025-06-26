@@ -76,7 +76,7 @@ let delta q s =
 
 let m = make_machine init_state f_states sigma delta init_tape p_a p_q
 
-let () = execute_tape m 5
+let () = execute_moving_head m 6 4
 
 
 

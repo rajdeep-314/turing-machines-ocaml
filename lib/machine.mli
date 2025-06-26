@@ -117,13 +117,17 @@ val print_head : ('a, 'q) t -> unit
 (** Print the smallest continguous section of the tape such that everything
     to it's left and right is just empty cells.
 
-    The symbol at the head is printed enclosed in asterisks.
-    For example, [1] would be printed as [*1*]. *)
+    The symbol at the head is printed in bold cyan with a dark purple background
+    using ANSI escape codes. *)
 val print_tape : ('a, 'q) t -> unit
 
 (** Prints the tape with [n] entries to either side of the head, [n] being
     the second argument to the function. *)
 val print_tape_extended : ('a, 'q) t -> int -> unit
+
+(** Prints a total of [n1] cells of the tape, with the head being at an offset
+    of [n2] (in the [n2]'th cell, starting from 1). *)
+val print_tape_pretty : ('a, 'q) t -> int -> int -> unit
 
 (** Print the state that the machine is currently in. *)
 val print_current_state : ('a, 'q) t -> unit
@@ -158,6 +162,19 @@ val execute : ('a, 'q) t -> unit
 
 (** "Runs" the machine, displaying it's tape at each stage, with [n] entries
     to the left and right of the head, [n] being the second argument to the
-    function. *)
-val execute_tape : ('a, 'q) t -> int -> unit
+    function.
+
+    This makes it look like the head stays fixed in one position and the tape
+    moves back and forth between stages. *)
+val execute_moving_tape : ('a, 'q) t -> int -> unit
+
+
+(** "Runs" the machine, displaying it's tape using the {!print_tape_pretty}
+    function. So, it prints the tape in each stage with [n1] of it's entries,
+    with the head being at an offset of [n2] in the first stage, and the tape in
+    the subsequent stages is printed as if it's the head that's moving across
+    that same section of the tape, rather than the tape moving while the head
+    stays fixed (like in {!print_tape_extended}). *)
+val execute_moving_head : ('a, 'q) t -> int -> int -> unit
+
 
