@@ -27,9 +27,7 @@ dune exec demo
 
 # Documentation
 
-You can read the documentation on this [GitLab page](https://rajdeep-314.gitlab.io/turing-machines-ocaml/), generated using [Odoc](https://github.com/ocaml/odoc).
-
-Alternatively, you can build the documentation yourself like so
+Read the documentation [here](https://rajdeep-314.gitlab.io/turing-machines-ocaml/) (generated using [Odoc](https://github.com/ocaml/odoc)), or build it yourself like so
 ```bash
 dune build @doc
 ```

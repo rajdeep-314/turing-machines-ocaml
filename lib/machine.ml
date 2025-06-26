@@ -184,11 +184,11 @@ let rec run_till_halt m =
 let rec execute_h m sn =
     let () = Printf.printf "Stage number %d" sn in
     let () = Printf.printf "\n------------------\n" in
+    let () = print_machine m in
+    let () = print_endline "\n\n" in
     if List.mem m.state m.f_states then
         Printf.printf "HALTED!\n"
     else
-        let () = print_machine m in
-        let () = print_endline "\n\n" in
         execute_h (run m) (sn + 1)
 
 let execute m =
@@ -202,8 +202,7 @@ let rec execute_moving_tape_h m n sn =
     let () = print_current_state m in
     let () = Printf.printf " ]" in
     let () = print_endline "" in
-    if List.mem m.state m.f_states then
-        print_endline ""
+    if List.mem m.state m.f_states then ()
     else
         execute_moving_tape_h (run m) n (sn + 1)
 
@@ -223,10 +222,9 @@ let rec execute_moving_head_h m n1 n2 sn =
     let () = Printf.printf "\t\t[ " in
     let () = print_current_state m in
     let () = Printf.printf " ]" in
-    if List.mem m.state m.f_states then
-        print_endline ""
+    let () = print_endline "" in
+    if List.mem m.state m.f_states then ()
     else
-        let () = print_endline "" in
         let Tape (l, v, r) = m.tape in
         let new_state, new_v, act = m.delta m.state v in
         let new_tape = move_head (Tape (l, new_v, r)) act in
