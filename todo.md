@@ -5,4 +5,6 @@
   whether the output will be colored or not.
 - Publish the documentation as a GitHub/GitLab page? Automate this process,
   maybe.
+- Fix `print_tape_pretty`.
+- Update `README.md`.
 

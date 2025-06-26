@@ -84,27 +84,47 @@ let print_tape_extended m n =
     print_symb_list m r_list
 
 
+(* let print_tape_pretty m n1 n2 = *)
+(*     if n1 <= 0 then () *)
+(*     else *)
+(*         let () = Printf.printf "| " in *)
+(*         let (Tape (l, v, r)) = m.tape in *)
+(*         let l_len = max 0 (min (n2 - 1) n1) in *)
+(*         let r_len = max 0 (min (n1 - n2) n1) in *)
+(*         let l_list = List.rev (fix_length l l_len) in *)
+(*         let r_list = fix_length r r_len in *)
+(*         (* If the head is out of bounds on the left. *) *)
+(*         if n2 <= 0 then *)
+(*             print_symb_list m r_list *)
+(*         (* If the head is out of bounds on the right. *) *)
+(*         else if n2 > n1 then *)
+(*             print_symb_list m l_list *)
+(*         else *)
+(*             let () = print_symb_list m l_list in *)
+(*             let () = Printf.printf "\027[1;36;48;5;53m" in *)
+(*             let () = print_symb m v in *)
+(*             let () = Printf.printf "\027[0m | " in *)
+(*             print_symb_list m r_list *)
+
+
+(* For now, only accepts 1 <= n1 and 1 <= n2 <= n1. *)
 let print_tape_pretty m n1 n2 =
-    if n1 <= 0 then ()
+    if 1 > n1 then
+        failwith "Invalid argument (n1) to print_tape_pretty. n1 must be at least 1."
+    else if 1 > n2 || n2 > n1 then
+        failwith "Invalid argument (n2) to print_tape_pretty. 1 <= n2 <= n1 must hold."
     else
-        let () = Printf.printf "| " in
-        let (Tape (l, v, r)) = m.tape in
-        let l_len = max 0 (min (n2 - 1) n1) in
-        let r_len = max 0 (min (n1 - n2) n1) in
-        let l_list = List.rev (fix_length l l_len) in
-        let r_list = fix_length r r_len in
-        (* If the head is out of bounds on the left. *)
-        if n2 <= 0 then
-            print_symb_list m r_list
-        (* If the head is out of bounds on the right. *)
-        else if n2 > n1 then
-            print_symb_list m l_list
-        else
-            let () = print_symb_list m l_list in
-            let () = Printf.printf "\027[1;36;48;5;53m" in
-            let () = print_symb m v in
-            let () = Printf.printf "\027[0m | " in
-            print_symb_list m r_list
+    let () = Printf.printf "| " in
+    let (Tape (l, v, r)) = m.tape in
+    let l_len = max 0 (min (n2 - 1) n1) in
+    let r_len = max 0 (min (n1 - n2) n1) in
+    let l_list = List.rev (fix_length l l_len) in
+    let r_list = fix_length r r_len in
+    let () = print_symb_list m l_list in
+    let () = Printf.printf "\027[1;36;48;5;53m" in
+    let () = print_symb m v in
+    let () = Printf.printf "\027[0m | " in
+    print_symb_list m r_list
 
 
 let print_current_state m =

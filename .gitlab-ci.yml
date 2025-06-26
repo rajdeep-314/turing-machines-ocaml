@@ -1,0 +1,40 @@
+image:  ocaml/opam:debian-ocaml-4.14
+
+
+stages:
+  - build
+  - deploy
+
+
+before_script:
+  - opam init -y --bare
+  - eval $(opam env)
+  - opam install -y dune odoc
+
+
+build-doc:
+  stage:  build
+
+  script:
+    - dune build @doc
+    - mkdir -p public/
+    - cp -r _build/default/_doc/_html/* public/
+
+  artifacts:
+    paths:
+      - public
+
+
+pages:
+  stage:  deploy
+
+  script:
+    - echo "Deploying documentation..."       # placeholder
+
+  artifacts:
+    paths:
+      - public
+
+  only:
+    - main
+

@@ -69,7 +69,7 @@ type action =
         type is analogous to {m Q}.
         + [state]: A value of ['q], denoting the current state. Initially, this
         is {m q_0}.
-        + [f_states]: Contains ['q] values which are considered toe be final
+        + [f_states]: Contains ['q] values which are considered to be final
         states. This is analogous to {m F}.
         + [delta]: A curried function meant to take the current state and the
         alphabet at the head, to obtain the next state, the new symbol to be
@@ -126,7 +126,9 @@ val print_tape : ('a, 'q) t -> unit
 val print_tape_extended : ('a, 'q) t -> int -> unit
 
 (** Prints a total of [n1] cells of the tape, with the head being at an offset
-    of [n2] (in the [n2]'th cell, starting from 1). *)
+    of [n2] (in the [n2]'th cell, starting from 1).
+
+    NOTE:   For now, it only accepts [1 <= n1] and [1 <= n2 <= n1]. *)
 val print_tape_pretty : ('a, 'q) t -> int -> int -> unit
 
 (** Print the state that the machine is currently in. *)
