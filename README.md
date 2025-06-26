@@ -1,3 +1,6 @@
+[![pipeline status](https://gitlab.com/rajdeep-314/turing-machines-ocaml/badges/main/pipeline.svg)](https://gitlab.com/rajdeep-314/turing-machines-ocaml/-/commits/main)
+
+
 # Turing Machines
 
 I'm attempting to implement Turing machines in OCaml, at least to the extent
@@ -24,7 +27,9 @@ dune exec demo
 
 # Documentation
 
-Run this to generate the documentation through [Odoc](https://github.com/ocaml/odoc)
+You can read the documentation on this [GitLab page](https://rajdeep-314.gitlab.io/turing-machines-ocaml/), generated using [Odoc](https://github.com/ocaml/odoc).
+
+Alternatively, you can build the documentation yourself like so
 ```bash
 dune build @doc
 ```
