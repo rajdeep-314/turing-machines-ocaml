@@ -1,0 +1,6 @@
+[ 3-state Busy Beaver ]
+
+13:
+Head: 1
+Tape: ... | 1 | 1 | 1 | 1 | *1* | 1 | ...
+Current state: HALT

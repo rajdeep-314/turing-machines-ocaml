@@ -1,0 +1,6 @@
+[ 4-state Busy Beaver ]
+
+107:
+Head: .
+Tape: ... | 1 | *.* | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | ...
+Current state: HALT

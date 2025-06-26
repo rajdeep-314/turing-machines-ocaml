@@ -1,0 +1,6 @@
+[ 1-state Busy Beaver ]
+
+1:
+Head: .
+Tape: ... | 1 | *.* | ...
+Current state: HALT
