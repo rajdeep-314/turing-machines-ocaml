@@ -1,4 +1,4 @@
-(** A 3-state Busy Beaver created using the [Tm] library. *)
+(** A 4-state Busy Beaver created using the [Tm] library. *)
 
 
 open Tm.Machine
@@ -6,13 +6,13 @@ open Tm.Machine
 
 (** {1 Machine description} *)
 
-(** This machine is a 3-state Busy Beaver. It's taken from
-    {{:https://en.wikipedia.org/wiki/Turing_machine#Formal_definition} Wikipedia}. *)
+(** This machine is a 4-state Busy Beaver. It's taken from
+    {{:https://en.wikipedia.org/wiki/Busy_beaver#List_of_busy_beavers} Wikipedia}. *)
 
-(** The machine has four states, [A], [B], [C] and [HALT], the last one being
-    the only state at which the machine is said to have halted. *)
+(** The machine has four "actual" states, [A], [B], [C] and [D], with an
+    additional state [HALT] - the only final state. *)
 type state =
-    | A | B | C | HALT
+    | A | B | C | D | HALT
 
 (** The initial state is [A]. *)
 let init_state = A
@@ -43,6 +43,7 @@ let p_q = function
     | A -> Printf.printf "A"
     | B -> Printf.printf "B"
     | C -> Printf.printf "C"
+    | D -> Printf.printf "D"
     | HALT -> Printf.printf "HALT"
 
 
@@ -53,9 +54,9 @@ let p_q = function
     {t | Symbol | Write | Move  | Next State    |
        |--------|-------|-------|---------------|
        | 0      | 1     | Right |       B       |
-       | 1      | 1     | Left  |       C       |} *)
+       | 1      | 1     | Left  |       B       |} *)
 let delta_A = function
-    | Some One -> (C, Some One, Left)
+    | Some One -> (B, Some One, Left)
     | None -> (B, Some One, Right)
 
 (** Transition from [B].
@@ -63,32 +64,43 @@ let delta_A = function
     {t | Symbol | Write | Move  | Next State    |
        |--------|-------|-------|---------------|
        | 0      | 1     | Left  |       A       |
-       | 1      | 1     | Right |       B       |} *)
+       | 1      | 0     | Left  |       C       |} *)
 let delta_B = function
-    | Some One -> (B, Some One, Right)
+    | Some One -> (C, None, Left)
     | None -> (A, Some One, Left)
 
 (** Transition from [C].
 
     {t | Symbol | Write | Move  | Next State    |
        |--------|-------|-------|---------------|
-       | 0      | 1     | Left  |       B       |
-       | 1      | 1     | Right |       HALT    |} *)
+       | 0      | 1     | Right |       HALT    |
+       | 1      | 1     | Left  |       D       |} *)
 let delta_C = function
-    | Some One -> (HALT, Some One, Right)
-    | None -> (B, Some One, Left)
+    | Some One -> (D, Some One, Left)
+    | None -> (HALT, Some One, Right)
+
+(** Transition from [D].
+
+    {t | Symbol | Write | Move  | Next State    |
+       |--------|-------|-------|---------------|
+       | 0      | 1     | Right |       D       |
+       | 1      | 0     | Right |       A       |} *)
+let delta_D = function
+    | Some One -> (A, None, Right)
+    | None -> (D, Some One, Right)
 
 (** Serves no purpose other than making the delta function
     define-able. *)
 let delta_HALT _ = (HALT, None, Nothing)
 
-(** The main transition function, combining {!delta_A}, {!delta_B} and
-    {!delta_C}. *)
+(** The main transition function, combining {!delta_A}, {!delta_B}, {!delta_C}
+    and {!delta_D}. *)
 let delta q s =
     match q with
     | A -> delta_A s
     | B -> delta_B s
     | C -> delta_C s
+    | D -> delta_D s
     | HALT -> delta_HALT s
 
 
