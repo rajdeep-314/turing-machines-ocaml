@@ -104,7 +104,7 @@ let delta_E = function
     define-able. *)
 let delta_HALT _ = (HALT, None, Nothing)
 
-(** The main transition function, combining {!delta_A} through {!delta_E} *)
+(** The main transition function, combining {!delta_A} through {!delta_E}. *)
 let delta q s =
     match q with
     | A -> delta_A s

@@ -184,6 +184,6 @@ val execute_moving_head : ('a, 'q) t -> int -> int -> unit
     machine halts, along with how many steps it took to get to that stage. This
     speeds up the process immensely. In concrete terms, running the 5-state Busy
     Beaver machine (from [examples/bb5.ml]) only takes ~2.5 seconds, for
-    47176870 steps. *)
+    47,176,870 steps. *)
 val execute_fast : ('a, 'q) t-> unit
 
