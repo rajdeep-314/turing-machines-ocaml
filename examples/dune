@@ -1,0 +1,4 @@
+(library
+ (name examples)
+ (public_name tm.examples)
+ (libraries tm))

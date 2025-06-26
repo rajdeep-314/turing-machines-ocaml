@@ -65,7 +65,7 @@ let print_tape m =
     let (Tape (l, v, r)) = m.tape in
     let () = Printf.printf "... | " in
     let () = print_symb_list m (List.rev l) in
-    let () = Printf.printf "\027[1;36m" in
+    let () = Printf.printf "\027[1;36;48;5;53m" in
     let () = print_symb m v in
     let () = Printf.printf "\027[0m | " in
     let () = print_symb_list m r in
@@ -178,8 +178,11 @@ let execute m =
 let rec execute_moving_tape_h m n sn =
     let () = Printf.printf "%d:\t\t" sn in
     if List.mem m.state m.f_states then
-        Printf.printf "HALTED!\n"
+        Printf.printf "[ HALTED! ]\n"
     else
+        let () = Printf.printf "[ " in
+        let () = print_current_state m in
+        let () = Printf.printf " ]\t" in
         let () = print_tape_extended m n in
         let () = print_endline "" in
         execute_moving_tape_h (run m) n (sn + 1)
@@ -197,8 +200,11 @@ let head_offset_delta = function
 let rec execute_moving_head_h m n1 n2 sn =
     let () = Printf.printf "%d:\t\t" sn in
     if List.mem m.state m.f_states then
-        Printf.printf "HALTED!\n"
+        Printf.printf "[ HALTED! ]\n"
     else
+        let () = Printf.printf "[ " in
+        let () = print_current_state m in
+        let () = Printf.printf " ]\t" in
         let () = print_tape_pretty m n1 n2 in
         let () = print_endline "" in
         let Tape (l, v, r) = m.tape in

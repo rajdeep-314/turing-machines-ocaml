@@ -1,9 +1,8 @@
 # To do
 
-- Turn `demo/` into `examples/` - a library with each module being an example.
-  This will allow Odoc to generate documentation as well. Make `.mli` files for
-  the examples. Make `bin/` with an executable `main.ml` that demonstrates one
-  of the examples.
+- Make more examples, maybe more Busy Beavers as examples.
+- Add an optional argument to the execute and print functions to determine
+  whether the output will be colored or not.
 - Publish the documentation as a GitHub/GitLab page? Automate this process,
   maybe.
 

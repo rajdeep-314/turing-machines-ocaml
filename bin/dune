@@ -1,0 +1,4 @@
+(executables
+ (public_names bb1 bb2 bb3)
+ (names bb1 bb2 bb3)
+ (libraries tm examples))

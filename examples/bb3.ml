@@ -1,6 +1,8 @@
-(** A demo on how to use the [Tm] library. *)
+(** A 3-state Busy Beaver created using the [Tm] library. *)
+
 
 open Tm.Machine
+
 
 (** {1 Machine description} *)
 
@@ -12,9 +14,11 @@ open Tm.Machine
 type state =
     | A | B | C | HALT
 
-(** The initial state is [A] and the only final state is [HALT]. *)
+(** The initial state is [A]. *)
 let init_state = A
-and f_states = [ HALT ]
+
+(** The only final state is [HALT]. *)
+let f_states = [ HALT ]
 
 
 (** There are meant to be two symbols in the alphabet including the black symbol.
@@ -45,17 +49,32 @@ let p_q = function
 
 (** {2 Transition function} *)
 
-(** Transition from [A]. *)
+(** Transition from [A].
+
+    {t | Symbol | Write | Move  | Next State    |
+       |--------|-------|-------|---------------|
+       | 0      | 1     | Right |       B       |
+       | 1      | 1     | Left  |       C       |} *)
 let delta_A = function
     | Some One -> (C, Some One, Left)
     | None -> (B, Some One, Right)
 
-(** Transition from [B]. *)
+(** Transition from [B].
+
+    {t | Symbol | Write | Move  | Next State    |
+       |--------|-------|-------|---------------|
+       | 0      | 1     | Left  |       A       |
+       | 1      | 1     | Right |       B       |} *)
 let delta_B = function
     | Some One -> (B, Some One, Right)
     | None -> (A, Some One, Left)
 
-(** Transition from [C]. *)
+(** Transition from [C].
+
+    {t | Symbol | Write | Move  | Next State    |
+       |--------|-------|-------|---------------|
+       | 0      | 1     | Left  |       B       |
+       | 1      | 1     | Right |       HALT    |} *)
 let delta_C = function
     | Some One -> (HALT, Some One, Right)
     | None -> (B, Some One, Left)
@@ -64,6 +83,8 @@ let delta_C = function
     define-able. *)
 let delta_HALT _ = (HALT, None, Nothing)
 
+(** The main transition function, combining {!delta_A}, {!delta_B} and
+    {!delta_C}. *)
 let delta q s =
     match q with
     | A -> delta_A s
@@ -72,11 +93,10 @@ let delta q s =
     | HALT -> delta_HALT s
 
 
-(** {2 Turing machine} *)
+(** {2 The Turing machine} *)
 
+(** A result of {!Tm.Machine.make_machine} with all the above values passed to
+    it. *)
 let m = make_machine init_state f_states sigma delta init_tape p_a p_q
-
-let () = execute_moving_head m 6 4
-
 
 
