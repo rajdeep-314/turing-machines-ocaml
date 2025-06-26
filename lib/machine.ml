@@ -242,3 +242,14 @@ let execute_moving_head m n1 n2 =
     execute_moving_head_h m n1 n2 1
 
 
+let rec execute_fast_h m sn =
+    if List.mem m.state m.f_states then
+        let () = Printf.printf "%d:\n" sn in
+        let () = print_machine m in
+        print_endline ""
+    else
+        execute_fast_h (run m) (sn + 1)
+
+let execute_fast m =
+    execute_fast_h m 0
+
