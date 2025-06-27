@@ -1,4 +1,4 @@
 (executables
- (public_names bb1 bb2 bb3 bb4 bb5)
- (names bb1 bb2 bb3 bb4 bb5)
+ (public_names bb1 bb2 bb3 bb4 bb5 rajdeep first)
+ (names bb1 bb2 bb3 bb4 bb5 rajdeep first)
  (libraries tm examples))

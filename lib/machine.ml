@@ -10,6 +10,7 @@ type 'a tape =
     Tape of 'a option list * 'a option * 'a option list
 
 let make_tape l v r = Tape (l, v, r)
+let empty_tape () = make_tape [] None []
 
 let tape_head (Tape (_, v, _)) = v
 
@@ -44,7 +45,7 @@ let make_machine q0 f_states sigma delta tape p_a p_q =
           printer_a = p_a ;
           printer_q = p_q }
     else
-        failwith "Incompatible starting tape and \\Sigma values."
+        failwith "The starting tape is incompatible with the machine's sigma"
 
 
 
@@ -215,8 +216,29 @@ let head_offset_delta = function
     | Right -> 1
     | Nothing -> 0
 
+let rec execute_moving_head_h_lm m lm n1 n2 sn =
+    let () = Printf.printf "%d:\t\t" sn in
+    let () = print_tape_pretty m n1 n2 in
+    let () = Printf.printf "\t\t[ " in
+    let () = print_current_state m in
+    let () = Printf.printf " ]" in
+    let () = print_endline "" in
+    if List.mem m.state m.f_states || sn >= lm then ()
+    else
+        let Tape (l, v, r) = m.tape in
+        let new_state, new_v, act = m.delta m.state v in
+        let new_tape = move_head (Tape (l, new_v, r)) act in
+        let new_m = 
+            { state = new_state ;
+              f_states = m.f_states ;
+              delta = m.delta ;
+              tape = new_tape ;
+              printer_a = m.printer_a ;
+              printer_q = m.printer_q } in
+        let new_n2 = n2 + head_offset_delta act in
+        execute_moving_head_h_lm new_m lm n1 new_n2 (sn + 1)
 
-let rec execute_moving_head_h m n1 n2 sn =
+let rec execute_moving_head_h_no_lm m n1 n2 sn =
     let () = Printf.printf "%d:\t\t" sn in
     let () = print_tape_pretty m n1 n2 in
     let () = Printf.printf "\t\t[ " in
@@ -236,10 +258,12 @@ let rec execute_moving_head_h m n1 n2 sn =
               printer_a = m.printer_a ;
               printer_q = m.printer_q } in
         let new_n2 = n2 + head_offset_delta act in
-        execute_moving_head_h new_m n1 new_n2 (sn + 1)
+        execute_moving_head_h_no_lm new_m n1 new_n2 (sn + 1)
 
-let execute_moving_head m n1 n2 =
-    execute_moving_head_h m n1 n2 1
+let execute_moving_head m ?(limit=None) n1 n2 =
+    match limit with
+    | None -> execute_moving_head_h_no_lm m n1 n2 1
+    | Some lm -> execute_moving_head_h_lm m lm n1 n2 1
 
 
 let rec execute_fast_h m sn =

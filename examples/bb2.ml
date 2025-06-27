@@ -29,7 +29,7 @@ type alphabet =
 let sigma = [ One ]
 
 (** The inital tape is completely blank. *)
-let init_tape = make_tape [] None []
+let init_tape = empty_tape ()
 
 
 (** Printer function for the alphabet. *)

@@ -35,6 +35,9 @@ type 'a tape =
 (** Helper function to construct a tape. *)
 val make_tape : 'a option list -> 'a option -> 'a option list -> 'a tape
 
+(** Makes an empty tape - a tape with all cells blank. *)
+val empty_tape : unit -> 'a tape
+
 
 (** Gives the value at the head for a tape. *)
 val tape_head : 'a tape -> 'a option
@@ -176,8 +179,11 @@ val execute_moving_tape : ('a, 'q) t -> int -> unit
     with the head being at an offset of [n2] in the first stage, and the tape in
     the subsequent stages is printed as if it's the head that's moving across
     that same section of the tape, rather than the tape moving while the head
-    stays fixed (like in {!print_tape_extended}). *)
-val execute_moving_head : ('a, 'q) t -> int -> int -> unit
+    stays fixed (like in {!print_tape_extended}).
+
+    The int option parameter which is set to [None] by default is for a limit on
+    the number of stages. *)
+val execute_moving_head : ('a, 'q) t -> ?limit:int option -> int -> int -> unit
 
 
 (** Executes a Turing machine, only displaying the info at the point when the
