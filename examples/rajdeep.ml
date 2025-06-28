@@ -24,7 +24,6 @@ let f_states = [ H ]
 type alphabet =
     | R | A | J | D | E | P
 
-(** For ease of writing the transition functions. *)
 let r = Some R
 let a = Some A
 let j = Some J
