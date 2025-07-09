@@ -8,6 +8,20 @@ The project contains a library that you can use to define your own Turing
 machines, along with a few [examples](#examples) that demonstrate the same.
 
 
+# Contents
+
+- [Documentation](#documentation)
+- [Examples](#examples)
+    - [BB(n)](#bbn)
+    - [First](#first)
+    - [Rajdeep](#rajdeep)
+- [Using as a library](#using-as-a-library)
+    - [Types and values](#types-and-values)
+    - [Transition function](#transition-function)
+    - [The machine](#the-machine)
+    - [Execution](#execution)
+- [Issues](#issues)
+
 
 # Documentation
 
