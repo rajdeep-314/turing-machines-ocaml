@@ -5,7 +5,7 @@
 # Turing Machines
 
 The project contains a library that you can use to define your own Turing
-machines, along with a few [examples][#examples] that demonstrate the same.
+machines, along with a few [examples](#examples) that demonstrate the same.
 
 
 
@@ -49,8 +49,9 @@ While the $BB(1)$ through $BB(4)$ machines halt in a few steps ($< 150$), that
 isn't the case for $BB(5)$, which halts after $47,176,870$ steps. So, it's not
 practical to run the $BB(5)$ machine and show the tape at all steps, which is
 why I've used the `Tm.Machine.execute_fast` function instead of the usual
-`Tm.Machine.moving_head` inside it's executable, which executes till halt, and
-then shows the number of steps taken, the final tape and the final state.
+`Tm.Machine.execute_moving_head` inside it's executable, which executes till
+halt, and then shows the number of steps taken, the final tape and the final
+state.
 
 For $BB(1)$ through $BB(4)$, the machine displays information for each step till
 halt. This information includes the tape, the head's position and the state.
