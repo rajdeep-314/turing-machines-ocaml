@@ -161,8 +161,7 @@ val run : ('a, 'q) t -> ('a, 'q) t
 val run_till_halt : ('a, 'q) t -> ('a, 'q) t
 
 (** "Runs" the machine, displaying it's info at each stage using
-    [print_machine], along with the stage number.
-    Meant to be called by programs using this as a library. *)
+    [print_machine], along with the stage number. *)
 val execute : ('a, 'q) t -> unit
 
 (** "Runs" the machine, displaying it's tape at each stage, with [n] entries
