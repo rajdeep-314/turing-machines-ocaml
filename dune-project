@@ -5,15 +5,15 @@
 (generate_opam_files true)
 
 (source
- (github username/reponame))
+ (gitlab rajdeep-314/turing-machines-ocaml))
 
-(authors "Author Name <author@example.com>")
+(authors "Rajdeep <rajdeep31415@gmail.com>")
 
-(maintainers "Maintainer Name <maintainer@example.com>")
+(maintainers "Rajdeep <rajdeep31415@gmail.com>")
 
 (license LICENSE)
 
-(documentation https://url/to/documentation)
+(documentation https://rajdeep-314.gitlab.io/turing-machines-ocaml)
 
 (package
  (name tm)
